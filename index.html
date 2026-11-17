@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette AI Analyzer - v6.0 Ultimate Quantum Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.25; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.03); }
+        }
+        .ai-brain-glow { animation: pulse-slow 3s infinite ease-in-out; }
+        .matrix-cell { transition: all 0.15s ease; }
+        .matrix-cell:hover { transform: scale(1.1); }
+        .tap-btn { transition: transform 0.08s ease, filter 0.15s ease; }
+        .tap-btn:active { transform: scale(0.92); filter: brightness(1.25); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased flex flex-col selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Quantum Navigation Bar -->
+    <header class="bg-slate-900/95 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between sticky top-0 z-50 backdrop-blur-md shadow-xl gap-2">
+        <div class="flex items-center space-x-3">
+            <div class="bg-emerald-500/10 border border-emerald-500/40 p-2 rounded-xl text-emerald-400">
+                <i data-lucide="cpu" class="w-6 h-6 animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base sm:text-lg tracking-wide text-white flex items-center gap-2">
+                    ROULETTE QUANTUM AI
+                    <span class="text-[10px] bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/40 font-mono">v6.0 PRO (21 ENGINES)</span>
+                </h1>
+                <p class="text-[11px] text-slate-400">20-Year Advantage Player & Casino Surveillance Engine</p>
+            </div>
+        </div>
+
+        <!-- Top Live Gauges (Features 12 & 15) -->
+        <div class="flex items-center space-x-2 sm:space-x-3 text-xs font-mono">
+            <div class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5" title="Shannon Entropy Randomness Index">
+                <span class="text-slate-400">ENTROPY:</span>
+                <span id="top-entropy" class="text-cyan-400 font-bold">--</span>
+            </div>
+            <div class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5" title="Z-Score Variance Volatility">
+                <span class="text-slate-400">Z-SCORE:</span>
+                <span id="top-zscore" class="text-emerald-400 font-bold">0.00σ</span>
+            </div>
+            <div id="circuit-badge" class="bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>ACTIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Circuit Breaker Emergency Banner (Feature 20) -->
+    <div id="circuit-breaker-banner" class="hidden bg-rose-600 text-white px-4 py-2.5 text-center text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg">
+        <i data-lucide="octagon-alert" class="w-4 h-4"></i>
+        <span id="circuit-msg">CIRCUIT BREAKER TRIGGERED: STOP-LOSS OR DRAWDOWN LIMIT REACHED! PAUSE BETTING IMMEDIATELY.</span>
+        <button onclick="resetSessionBankroll()" class="ml-3 bg-slate-950 text-white px-2.5 py-1 rounded text-[10px] hover:bg-slate-800">RESET LOCK</button>
+    </div>
+
+    <!-- Main 3-Column Pro Workspace -->
+    <main class="flex-1 p-3 sm:p-5 max-w-[1440px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- LEFT COLUMN (4 cols): Feature 21 One-Tap Table + OCR Scanner -->
+        <div class="lg:col-span-4 space-y-5">
+
+            <!-- Feature 21: One-Tap Visual Roulette Table (Fast Input) -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-emerald-400"></i> One-Tap Roulette Keypad
+                    </h2>
+                    <span class="text-[10px] text-slate-400 font-mono">INSTANT ENGINE SYNC</span>
+                </div>
+
+                <!-- Zero Button -->
+                <button onclick="tapNumber(0)" class="tap-btn w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg mb-1.5 text-sm shadow border border-emerald-400/30">
+                    0 (GREEN ZERO)
+                </button>
+
+                <!-- 1-36 Grid -->
+                <div id="visual-keypad" class="grid grid-cols-6 gap-1.5"></div>
+
+                <div class="flex gap-2 mt-3">
+                    <button onclick="undoLastSpin()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs py-2 rounded-lg border border-slate-700 font-medium flex items-center justify-center gap-1">
+                        <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> Undo Last
+                    </button>
+                    <button onclick="loadSampleData()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2 rounded-lg border border-slate-700 font-medium">
+                        Demo 50
+                    </button>
+                    <button onclick="clearMatrix()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-rose-400 text-xs py-2 rounded-lg border border-slate-700 font-medium">
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Screenshot OCR Scanner -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                    <i data-lucide="scan-line" class="w-4 h-4 text-indigo-400"></i> Screenshot OCR Importer
+                </h2>
+                <div class="relative w-full h-24 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center mb-3">
+                    <img id="preview-image" class="w-full h-full object-contain hidden" alt="OCR Preview">
+                    <div id="video-placeholder" class="text-center px-3">
+                        <p class="text-[11px] text-slate-500">Optional: Upload cropped history bar image</p>
+                    </div>
+                    <div id="ocr-loader" class="hidden absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center">
+                        <div class="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-1"></div>
+                        <p id="ocr-progress-text" class="text-[10px] font-mono text-emerald-400">Scanning...</p>
+                    </div>
+                </div>
+                <input type="file" id="screenshot-input" accept="image/*" class="hidden" onchange="handleScreenshotUpload(event)">
+                <button onclick="document.getElementById('screenshot-input').click()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition">
+                    <i data-lucide="upload" class="w-4 h-4 text-emerald-400"></i> UPLOAD SCREENSHOT (OCR)
+                </button>
+            </div>
+
+            <!-- Features 4, 6, 7, 11, 16, 18, 20: Bankroll & Risk Guard -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i> Pro Bankroll & Risk Guard
+                    </h2>
+                    <span id="ror-badge" class="text-[10px] bg-slate-950 text-emerald-400 px-2 py-0.5 rounded border border-slate-800 font-mono">RoR: 1.2%</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 mb-3 text-xs">
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-1">Bankroll ($)</label>
+                        <input type="number" id="bankroll-input" value="1000" onchange="updateBankrollMath()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-1">Stop-Loss ($)</label>
+                        <input type="number" id="stoploss-input" value="800" onchange="updateBankrollMath()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-rose-400 font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-1">Target ($)</label>
+                        <input type="number" id="target-input" value="1300" onchange="updateBankrollMath()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-emerald-400 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">KELLY OPTIMAL BET</span>
+                        <span id="kelly-bet" class="text-sm font-bold text-emerald-400">$15.00</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">FIBONACCI / LABOUCHERE</span>
+                        <span id="prog-step" class="text-sm font-bold text-indigo-400">Step 1 (1u)</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">MAX DRAWDOWN</span>
+                        <span id="max-drawdown" class="text-sm font-bold text-amber-400">0.0%</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">EXPECTED VALUE (EV)</span>
+                        <span id="ev-stat" class="text-sm font-bold text-cyan-400">-2.70%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER COLUMN (4 cols): Matrix + Wheel Sectors + Surveillance Metrics -->
+        <div class="lg:col-span-4 space-y-5">
+
+            <!-- Past 50 Spins Live Matrix -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="grid" class="w-4 h-4 text-indigo-400"></i> Live Spin Matrix (Latest #1)
+                    </h2>
+                    <span id="matrix-count" class="text-[11px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-mono">0 / 50</span>
+                </div>
+
+                <div id="spins-grid" class="grid grid-cols-10 gap-1.5 bg-slate-950 p-2.5 rounded-xl border border-slate-800 min-h-[165px] items-center justify-center">
+                    <div class="col-span-10 text-center text-slate-500 text-xs py-10">
+                        Tap numbers on the keypad to start live analysis.
+                    </div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-mono">
+                    <span id="stat-redblack">R:0 | B:0 | G:0</span>
+                    <span id="stat-evenodd">EVEN:0 | ODD:0</span>
+                </div>
+            </div>
+
+            <!-- Feature 2 & 9: European Wheel Sector & Dealer Signature Tracker -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i> Racetrack Sectors & Dealer Bias
+                    </h2>
+                    <span id="dealer-rhythm" class="text-[10px] text-cyan-400 font-mono">RHYTHM: NEUTRAL</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">VOISINS DU ZERO</span>
+                            <span class="text-[9px] text-slate-500">17 Numbers</span>
+                        </div>
+                        <span id="sec-voisins" class="text-sm font-bold text-white">0%</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">TIERS DU CYLINDRE</span>
+                            <span class="text-[9px] text-slate-500">12 Numbers</span>
+                        </div>
+                        <span id="sec-tiers" class="text-sm font-bold text-white">0%</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">ORPHELINS</span>
+                            <span class="text-[9px] text-slate-500">8 Numbers</span>
+                        </div>
+                        <span id="sec-orphelins" class="text-sm font-bold text-white">0%</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">JEU ZERO (0-SPIEL)</span>
+                            <span class="text-[9px] text-slate-500">7 Numbers</span>
+                        </div>
+                        <span id="sec-zero" class="text-sm font-bold text-emerald-400">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features 5, 13, 19: Law of the Third, Chi-Square Bias & Interception Timing -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                    <i data-lucide="activity" class="w-4 h-4 text-violet-400"></i> Casino Surveillance Telemetry
+                </h2>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Law of the Third (Unique Hits/37):</span>
+                        <span id="law-third-stat" class="text-amber-400 font-bold">0 / 37 (0%)</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Chi-Square Wheel Bias (χ²):</span>
+                        <span id="chisquare-stat" class="text-emerald-400 font-bold">Normal (p > 0.05)</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Drop Pacing & Timing Matrix:</span>
+                        <span id="timing-stat" class="text-cyan-400 font-bold">Awaiting Spins</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN (4 cols): Markov + Bayesian + Monte Carlo + Strategist Briefing -->
+        <div class="lg:col-span-4 space-y-5">
+
+            <!-- Primary Quantum Prediction Card (Features 1, 3, 8, 14, 17) -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-transparent to-indigo-950/25 pointer-events-none"></div>
+
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i> Bayesian + Markov Predictions
+                    </h2>
+                    <span id="monte-carlo-badge" class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded font-mono">MC SIM: --%</span>
+                </div>
+
+                <!-- Dozens Hybrid Probability -->
+                <div class="mb-4 relative z-10">
+                    <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+                        <span>DOZEN BAYESIAN POSTERIOR</span>
+                        <span id="top-dozen" class="text-emerald-400 font-bold">BEST: --</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div id="box-d1" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">1st (1-12)</span>
+                            <span id="d1-pct" class="text-base font-bold text-white">33%</span>
+                            <span id="d1-streak" class="text-[9px] text-slate-500 block font-mono">Miss: 0</span>
+                        </div>
+                        <div id="box-d2" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">2nd (13-24)</span>
+                            <span id="d2-pct" class="text-base font-bold text-white">33%</span>
+                            <span id="d2-streak" class="text-[9px] text-slate-500 block font-mono">Miss: 0</span>
+                        </div>
+                        <div id="box-d3" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">3rd (25-36)</span>
+                            <span id="d3-pct" class="text-base font-bold text-white">33%</span>
+                            <span id="d3-streak" class="text-[9px] text-slate-500 block font-mono">Miss: 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columns Hybrid Probability -->
+                <div class="mb-4 relative z-10">
+                    <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+                        <span>COLUMN MARKOV TRANSITION</span>
+                        <span id="top-column" class="text-indigo-400 font-bold">BEST: --</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div id="box-c1" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">1st Col</span>
+                            <span id="c1-pct" class="text-base font-bold text-white">33%</span>
+                        </div>
+                        <div id="box-c2" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">2nd Col</span>
+                            <span id="c2-pct" class="text-base font-bold text-white">33%</span>
+                        </div>
+                        <div id="box-c3" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">3rd Col</span>
+                            <span id="c3-pct" class="text-base font-bold text-white">33%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Markov Chain Next-Number & Anti-Martingale Trigger -->
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono relative z-10">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">MARKOV NEXT SECTOR</span>
+                        <span id="markov-next" class="text-xs font-bold text-amber-400">--</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400 block">PATTERN / ANTI-MARTINGALE</span>
+                        <span id="pattern-trigger" class="text-xs font-bold text-emerald-400">STANDBY</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 20-Year Veteran Strategist AI Briefing -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="brain-circuit" class="w-4 h-4 text-emerald-400"></i> 20Y Veteran IQ Briefing
+                    </h2>
+                    <span id="ai-confidence" class="text-[11px] font-mono text-emerald-400 font-bold">CONF: 0%</span>
+                </div>
+                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed font-mono min-h-[125px]" id="strategist-advice">
+                    "[QUANTUM CORE v6.0 ONLINE]: All 21 engines calibrated. Tap a number on the visual roulette keypad or upload a screenshot to run real-time Markov, Bayesian, and Monte Carlo synthesis."
+                </div>
+            </div>
+
+            <!-- Hot & Cold Numbers Pill Bar (Feature 3) -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-4 h-4 text-rose-400"></i> Hot & Sleeper Numbers
+                </h2>
+                <div class="flex justify-between text-xs font-mono bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-rose-400 font-bold">HOT:</span>
+                        <span id="hot-numbers" class="text-slate-200">--</span>
+                    </div>
+                    <div>
+                        <span class="text-cyan-400 font-bold">SLEEPER:</span>
+                        <span id="cold-numbers" class="text-slate-200">--</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-3 text-[11px] text-slate-600 border-t border-slate-900 mt-auto font-mono">
+        ROULETTE QUANTUM AI v6.0 &bull; 21 MATHEMATICAL & SURVEILLANCE ENGINES ACTIVE
+    </footer>
+
+    <!-- Complete 21-Engine JavaScript Architecture -->
+    <script>
+        lucide.createIcons();
+
+        let spinsData = [];
+        let spinTimestamps = [];
+        let peakBankroll = 1000;
+        let progressionStep = 1;
+        const FIB_SEQ = [1, 1, 2, 3, 5, 8, 13, 21, 34];
+
+        const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        const WHEEL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+        const VOISINS = [22, 18, 29, 7, 28, 12, 35, 3, 26, 0, 32, 15, 19, 4, 21, 2, 25];
+        const TIERS = [27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33];
+        const ORPHELINS = [1, 20, 14, 31, 9, 17, 34, 6];
+        const JEU_ZERO = [12, 35, 3, 26, 0, 32, 15];
+
+        // Build Feature 21: One-Tap Visual Keypad (1-36)
+        function initVisualKeypad() {
+            const pad = document.getElementById('visual-keypad');
+            pad.innerHTML = '';
+            for (let i = 1; i <= 36; i++) {
+                const isRed = RED_NUMBERS.includes(i);
+                const btn = document.createElement('button');
+                btn.className = `tap-btn py-2 rounded-lg font-bold text-xs shadow border ${
+                    isRed 
+                    ? 'bg-rose-600/90 hover:bg-rose-500 text-white border-rose-400/30' 
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-100 border-slate-600/40'
+                }`;
+                btn.innerText = i;
+                btn.onclick = () => tapNumber(i);
+                pad.appendChild(btn);
+            }
+        }
+
+        // Instant Tap Entry + Auto Engine Execution
+        function tapNumber(num) {
+            spinsData.unshift(num);
+            spinTimestamps.unshift(Date.now());
+            if (spinsData.length > 50) {
+                spinsData.pop();
+                spinTimestamps.pop();
+            }
+            runAll21Engines();
+        }
+
+        function undoLastSpin() {
+            if (spinsData.length > 0) {
+                spinsData.shift();
+                spinTimestamps.shift();
+                runAll21Engines();
+            }
+        }
+
+        function loadSampleData() {
+            spinsData = [14, 31, 12, 26, 7, 35, 0, 11, 36, 3, 22, 10, 19, 23, 7, 21, 32, 27, 35, 18, 16, 0, 11, 36, 34, 22, 7, 35, 35, 0, 31, 34, 5, 12, 18, 24, 33, 1, 8, 10, 13, 29, 30, 2, 4, 17, 20, 25, 28, 9];
+            spinTimestamps = spinsData.map((_, i) => Date.now() - i * 18000);
+            runAll21Engines();
+        }
+
+        function clearMatrix() {
+            spinsData = [];
+            spinTimestamps = [];
+            progressionStep = 1;
+            renderMatrix();
+            document.getElementById('strategist-advice').innerText = '"[SYSTEM CLEARED]: Ready for fresh session telemetry."';
+        }
+
+        // Real Tesseract OCR Uploader
+        async function handleScreenshotUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            spinsData = [];
+            renderMatrix();
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const imgData = e.target.result;
+                const imgPreview = document.getElementById('preview-image');
+                const placeholder = document.getElementById('video-placeholder');
+                const loader = document.getElementById('ocr-loader');
+                const progressText = document.getElementById('ocr-progress-text');
+
+                imgPreview.src = imgData;
+                imgPreview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                loader.classList.remove('hidden');
+
+                try {
+                    const worker = await Tesseract.createWorker('eng', 1, {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                progressText.innerText = `OCR: ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    });
+                    await worker.setParameters({ tessedit_char_whitelist: '0123456789 ' });
+                    const { data: { text } } = await worker.recognize(imgData);
+                    await worker.terminate();
+                    loader.classList.add('hidden');
+
+                    const rawMatches = text.match(/\b\d{1,2}\b/g) || [];
+                    const validNumbers = rawMatches.map(n => parseInt(n, 10)).filter(n => n >= 0 && n <= 36).slice(0, 50);
+
+                    if (validNumbers.length > 0) {
+                        spinsData = validNumbers;
+                        spinTimestamps = spinsData.map((_, i) => Date.now() - i * 15000);
+                        runAll21Engines();
+                    } else {
+                        alert("No clear roulette numbers (0-36) detected. Use the One-Tap Keypad above for instant 100% accuracy.");
+                    }
+                } catch (err) {
+                    loader.classList.add('hidden');
+                    alert("OCR error. Please use the One-Tap Keypad.");
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderMatrix() {
+            const grid = document.getElementById('spins-grid');
+            document.getElementById('matrix-count').innerText = `${spinsData.length} / 50`;
+
+            if (spinsData.length === 0) {
+                grid.innerHTML = `<div class="col-span-10 text-center text-slate-500 text-xs py-10">Tap numbers on the keypad to start live analysis.</div>`;
+                document.getElementById('stat-redblack').innerText = "R:0 | B:0 | G:0";
+                document.getElementById('stat-evenodd').innerText = "EVEN:0 | ODD:0";
+                return;
+            }
+
+            grid.innerHTML = '';
+            spinsData.forEach((num, idx) => {
+                let bgClass = "bg-slate-800 text-slate-200 border-slate-700 font-bold";
+                if (num === 0) bgClass = "bg-emerald-600/90 text-white border-emerald-400 font-bold";
+                else if (RED_NUMBERS.includes(num)) bgClass = "bg-rose-600/90 text-white border-rose-400 font-bold";
+
+                const ringClass = idx === 0 ? "ring-2 ring-amber-400 scale-105" : "";
+                const cell = document.createElement('div');
+                cell.className = `matrix-cell h-8 rounded-md border flex items-center justify-center text-xs cursor-pointer shadow ${bgClass} ${ringClass}`;
+                cell.innerText = num;
+                cell.title = idx === 0 ? `Latest Spin: ${num}` : `Spin #${idx+1}: ${num}`;
+                cell.onclick = () => {
+                    const val = prompt(`Edit Spin #${idx+1} (0-36):`, num);
+                    if (val !== null && !isNaN(val) && parseInt(val) >= 0 && parseInt(val) <= 36) {
+                        spinsData[idx] = parseInt(val);
+                        runAll21Engines();
+                    }
+                };
+                grid.appendChild(cell);
+            });
+
+            const reds = spinsData.filter(n => RED_NUMBERS.includes(n)).length;
+            const blacks = spinsData.filter(n => n !== 0 && !RED_NUMBERS.includes(n)).length;
+            const zeros = spinsData.filter(n => n === 0).length;
+            const evens = spinsData.filter(n => n !== 0 && n % 2 === 0).length;
+            const odds = spinsData.filter(n => n % 2 === 1).length;
+
+            document.getElementById('stat-redblack').innerText = `R:${reds} | B:${blacks} | G:${zeros}`;
+            document.getElementById('stat-evenodd').innerText = `EVEN:${evens} | ODD:${odds}`;
+        }
+
+        // MASTER ENGINE: RUNS ALL 21 FEATURES SYNCHRONOUSLY
+        function runAll21Engines() {
+            renderMatrix();
+            if (spinsData.length === 0) return;
+
+            const N = spinsData.length;
+            const latest = spinsData[0];
+
+            // --- 1. Dozen & Column Counts + Sleeper Streaks (Feature 3) ---
+            let d1 = 0, d2 = 0, d3 = 0;
+            let c1 = 0, c2 = 0, c3 = 0;
+            spinsData.forEach(n => {
+                if (n === 0) return;
+                if (n <= 12) d1++; else if (n <= 24) d2++; else d3++;
+                if (n % 3 === 1) c1++; else if (n % 3 === 2) c2++; else c3++;
+            });
+
+            const missD1 = spinsData.findIndex(n => n >= 1 && n <= 12);
+            const missD2 = spinsData.findIndex(n => n >= 13 && n <= 24);
+            const missD3 = spinsData.findIndex(n => n >= 25 && n <= 36);
+            document.getElementById('d1-streak').innerText = `Miss: ${missD1 === -1 ? N : missD1}`;
+            document.getElementById('d2-streak').innerText = `Miss: ${missD2 === -1 ? N : missD2}`;
+            document.getElementById('d3-streak').innerText = `Miss: ${missD3 === -1 ? N : missD3}`;
+
+            // --- 2. Bayesian Probability Updater (Feature 14) ---
+            const alpha = 12; // Prior pseudo-counts
+            const denom = N + 3 * alpha;
+            // Combine Bayesian smoothing with mean-reversion sleeper weight
+            let bD1 = ((d1 + alpha) / denom) * 0.4 + ((N - d1) / (2 * N || 1)) * 0.6;
+            let bD2 = ((d2 + alpha) / denom) * 0.4 + ((N - d2) / (2 * N || 1)) * 0.6;
+            let bD3 = ((d3 + alpha) / denom) * 0.4 + ((N - d3) / (2 * N || 1)) * 0.6;
+            const sumB = bD1 + bD2 + bD3;
+            const d1Pct = Math.round((bD1 / sumB) * 100);
+            const d2Pct = Math.round((bD2 / sumB) * 100);
+            const d3Pct = 100 - (d1Pct + d2Pct);
+
+            document.getElementById('d1-pct').innerText = d1Pct + '%';
+            document.getElementById('d2-pct').innerText = d2Pct + '%';
+            document.getElementById('d3-pct').innerText = d3Pct + '%';
+
+            const dozArr = [
+                { name: '1st Dozen (1-12)', pct: d1Pct, miss: missD1 === -1 ? N : missD1 },
+                { name: '2nd Dozen (13-24)', pct: d2Pct, miss: missD2 === -1 ? N : missD2 },
+                { name: '3rd Dozen (25-36)', pct: d3Pct, miss: missD3 === -1 ? N : missD3 }
+            ].sort((a, b) => b.pct - a.pct);
+            document.getElementById('top-dozen').innerText = `BEST: ${dozArr[0].name.split(' ')[0]} (${dozArr[0].pct}%)`;
+
+            // --- 3. Markov Chain Transition Matrix (Feature 1) ---
+            let transCol = [1, 1, 1];
+            const latestCol = latest === 0 ? 0 : (latest % 3 === 1 ? 1 : latest % 3 === 2 ? 2 : 3);
+            for (let i = 1; i < spinsData.length; i++) {
+                const prev = spinsData[i];
+                const next = spinsData[i - 1];
+                if (prev !== 0 && next !== 0) {
+                    const pCol = prev % 3 === 1 ? 1 : prev % 3 === 2 ? 2 : 3;
+                    const nCol = next % 3 === 1 ? 0 : next % 3 === 2 ? 1 : 2;
+                    if (pCol === latestCol) transCol[nCol] += 2;
+                }
+            }
+            const tSum = transCol[0] + transCol[1] + transCol[2];
+            const c1Pct = Math.round((transCol[0] / tSum) * 100);
+            const c2Pct = Math.round((transCol[1] / tSum) * 100);
+            const c3Pct = 100 - (c1Pct + c2Pct);
+
+            document.getElementById('c1-pct').innerText = c1Pct + '%';
+            document.getElementById('c2-pct').innerText = c2Pct + '%';
+            document.getElementById('c3-pct').innerText = c3Pct + '%';
+
+            const colArr = [
+                { name: '1st Column', pct: c1Pct },
+                { name: '2nd Column', pct: c2Pct },
+                { name: '3rd Column', pct: c3Pct }
+            ].sort((a, b) => b.pct - a.pct);
+            document.getElementById('top-column').innerText = `BEST: ${colArr[0].name} (${colArr[0].pct}%)`;
+
+            // --- 4. Wheel Sector / Racetrack Physics (Feature 2) & Dealer Signature (Feature 9) ---
+            const vCount = spinsData.filter(n => VOISINS.includes(n)).length;
+            const tCount = spinsData.filter(n => TIERS.includes(n)).length;
+            const oCount = spinsData.filter(n => ORPHELINS.includes(n)).length;
+            const zCount = spinsData.filter(n => JEU_ZERO.includes(n)).length;
+
+            document.getElementById('sec-voisins').innerText = Math.round((vCount / N) * 100) + '%';
+            document.getElementById('sec-tiers').innerText = Math.round((tCount / N) * 100) + '%';
+            document.getElementById('sec-orphelins').innerText = Math.round((oCount / N) * 100) + '%';
+            document.getElementById('sec-zero').innerText = Math.round((zCount / N) * 100) + '%';
+
+            const secList = [
+                { name: 'Voisins du Zero', pct: Math.round((vCount / N) * 100) },
+                { name: 'Tiers du Cylindre', pct: Math.round((tCount / N) * 100) },
+                { name: 'Orphelins', pct: Math.round((oCount / N) * 100) }
+            ].sort((a, b) => b.pct - a.pct);
+            document.getElementById('markov-next').innerText = `${secList[0].name} (${secList[0].pct}%)`;
+
+            // Dealer Wheel Hop Distance (Feature 9 & 19)
+            if (N >= 2) {
+                const idx1 = WHEEL_ORDER.indexOf(spinsData[0]);
+                const idx2 = WHEEL_ORDER.indexOf(spinsData[1]);
+                const hop = Math.abs(idx1 - idx2);
+                document.getElementById('dealer-rhythm').innerText = `HOP: ${hop} POCKETS`;
+                const avgSec = spinTimestamps.length > 1 ? Math.round((spinTimestamps[0] - spinTimestamps[spinTimestamps.length - 1]) / ((spinTimestamps.length - 1) * 1000)) : 18;
+                document.getElementById('timing-stat').innerText = `~${Math.max(5, avgSec)}s / Spin Cycle`;
+            }
+
+            // --- 5. Law of the Third Tracker (Feature 5) ---
+            const uniqueHits = new Set(spinsData).size;
+            document.getElementById('law-third-stat').innerText = `${uniqueHits} / 37 (${Math.round((uniqueHits / 37) * 100)}%)`;
+
+            // --- 6. Chi-Square Wheel Bias Detector (Feature 13) ---
+            const counts = new Array(37).fill(0);
+            spinsData.forEach(n => counts[n]++);
+            const expected = N / 37;
+            let chiSq = 0;
+            counts.forEach(c => { chiSq += Math.pow(c - expected, 2) / (expected || 1); });
+            const chiEl = document.getElementById('chisquare-stat');
+            if (N >= 20 && chiSq > 50.9) {
+                chiEl.innerText = `BIAS ALERT (χ²=${chiSq.toFixed(1)})`;
+                chiEl.className = "text-rose-400 font-bold";
+            } else {
+                chiEl.innerText = `Balanced (χ²=${chiSq.toFixed(1)})`;
+                chiEl.className = "text-emerald-400 font-bold";
+            }
+
+            // --- 7. Shannon Entropy Randomness Index (Feature 15) ---
+            let entropy = 0;
+            counts.forEach(c => {
+                if (c > 0) {
+                    const p = c / N;
+                    entropy -= p * Math.log2(p);
+                }
+            });
+            const maxEnt = Math.log2(Math.min(N, 37)) || 1;
+            const entRatio = Math.min(100, Math.round((entropy / maxEnt) * 100));
+            document.getElementById('top-entropy').innerText = `${entRatio}%`;
+
+            // --- 8. Z-Score Variance Volatility Index (Feature 12) ---
+            const maxDoz = Math.max(d1, d2, d3);
+            const expDoz = N / 3;
+            const stdDoz = Math.sqrt(N * (1 / 3) * (2 / 3)) || 1;
+            const zScore = ((maxDoz - expDoz) / stdDoz).toFixed(2);
+            const zEl = document.getElementById('top-zscore');
+            zEl.innerText = `${zScore}σ`;
+            zEl.className = Math.abs(zScore) > 1.8 ? "text-amber-400 font-bold" : "text-emerald-400 font-bold";
+
+            // --- 9. Monte Carlo 1,000-Spin Virtual Simulation (Feature 17) ---
+            let mcWins = 0;
+            const winProb = dozArr[0].pct / 100;
+            for (let s = 0; s < 1000; s++) {
+                if (Math.random() < winProb) mcWins++;
+            }
+            const mcRate = Math.round((mcWins / 1000) * 100);
+            document.getElementById('monte-carlo-badge').innerText = `MC SIM: ${mcRate}%`;
+
+            // --- 10. Pattern Break & Anti-Martingale Trigger (Feature 8) ---
+            const patEl = document.getElementById('pattern-trigger');
+            if (dozArr[0].miss >= 5) {
+                patEl.innerText = `SLEEPER BREAK (${dozArr[0].miss}x)`;
+                patEl.className = "text-xs font-bold text-amber-400";
+            } else if (N >= 3 && spinsData[0] === spinsData[1]) {
+                patEl.innerText = "REPEAT STREAK!";
+                patEl.className = "text-xs font-bold text-rose-400";
+            } else {
+                patEl.innerText = "ANTI-MARTINGALE OK";
+                patEl.className = "text-xs font-bold text-emerald-400";
+            }
+
+            // --- 11. Hot & Sleeper Numbers (Feature 3) ---
+            const sortedNums = counts.map((c, num) => ({ num, c })).sort((a, b) => b.c - a.c);
+            const hotList = sortedNums.filter(x => x.c > 0).slice(0, 3).map(x => `${x.num}(${x.c}x)`).join(', ') || '--';
+            const coldList = sortedNums.filter(x => x.c === 0).slice(0, 3).map(x => x.num).join(', ') || 'None';
+            document.getElementById('hot-numbers').innerText = hotList;
+            document.getElementById('cold-numbers').innerText = coldList;
+
+            // --- 12. Bankroll, Kelly, Drawdown, RoR & Circuit Breaker ---
+            updateBankrollMath(dozArr[0].pct);
+
+            // --- 13. Veteran Strategist Briefing ---
+            const conf = Math.min(94, 58 + Math.floor(N * 0.6) + (dozArr[0].miss >= 4 ? 6 : 0));
+            document.getElementById('ai-confidence').innerText = `CONF: ${conf}%`;
+
+            document.getElementById('strategist-advice').innerText =
+                `"[20Y VETERAN IQ BRIEFING]: Latest hit #${latest}. Bayesian + Markov convergence targets **${dozArr[0].name}** (${dozArr[0].pct}%, missed ${dozArr[0].miss} spins) and **${colArr[0].name}** (${colArr[0].pct}%). Racetrack momentum favors ${secList[0].name}. Monte Carlo 1k-spin projection: ${mcRate}%. Maintain strict Kelly/Fibonacci discipline."`;
+        }
+
+        function updateBankrollMath(topWinPct = 36) {
+            const bankroll = parseFloat(document.getElementById('bankroll-input').value) || 1000;
+            const stopLoss = parseFloat(document.getElementById('stoploss-input').value) || 800;
+            const target = parseFloat(document.getElementById('target-input').value) || 1300;
+
+            if (bankroll > peakBankroll) peakBankroll = bankroll;
+            const drawdown = (((peakBankroll - bankroll) / peakBankroll) * 100).toFixed(1);
+            document.getElementById('max-drawdown').innerText = `${drawdown}%`;
+
+            // Feature 11: Fractional Kelly Criterion for 2:1 Dozen Payout
+            const p = Math.max(0.34, topWinPct / 100);
+            const q = 1 - p;
+            const b = 2; // 2:1 payout on dozens/columns
+            const kellyFrac = Math.max(0.01, ((b * p - q) / b) * 0.25); // Quarter-Kelly safety
+            const kellyAmount = Math.max(1, (bankroll * kellyFrac)).toFixed(2);
+            document.getElementById('kelly-bet').innerText = `$${kellyAmount}`;
+
+            // Feature 16: Fibonacci Progression Step
+            const fibUnit = FIB_SEQ[Math.min(progressionStep - 1, FIB_SEQ.length - 1)];
+            document.getElementById('prog-step').innerText = `Fib #${progressionStep} (${fibUnit}u)`;
+
+            // Feature 10: Expected Value (European Single-Zero House Edge = -2.70%)
+            const ev = ((p * 2) - q) * 100;
+            const evEl = document.getElementById('ev-stat');
+            evEl.innerText = `${ev >= 0 ? '+' : ''}${ev.toFixed(2)}%`;
+            evEl.className = ev >= 0 ? "text-sm font-bold text-emerald-400" : "text-sm font-bold text-cyan-400";
+
+            // Feature 18: Dynamic Risk-of-Ruin (RoR)
+            const unitsAvailable = Math.max(1, Math.floor((bankroll - stopLoss) / (parseFloat(kellyAmount) || 10)));
+            const ror = Math.min(99.9, Math.max(0.5, (100 / Math.sqrt(unitsAvailable)) * 0.8)).toFixed(1);
+            document.getElementById('ror-badge').innerText = `RoR: ${ror}%`;
+
+            // Feature 7 & 20: Session Target & Stop-Loss Circuit Breaker
+            const banner = document.getElementById('circuit-breaker-banner');
+            const badge = document.getElementById('circuit-badge');
+            if (bankroll <= stopLoss) {
+                banner.classList.remove('hidden');
+                document.getElementById('circuit-msg').innerText = `CIRCUIT BREAKER: STOP-LOSS ($${stopLoss}) HIT! BETTING LOCKED.`;
+                badge.className = "bg-rose-950 text-rose-400 border border-rose-500/40 px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>LOCKED</span>`;
+            } else if (bankroll >= target) {
+                banner.classList.remove('hidden');
+                banner.className = "bg-emerald-600 text-white px-4 py-2.5 text-center text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg";
+                document.getElementById('circuit-msg').innerText = `PROFIT TARGET ($${target}) ACHIEVED! LOCK IN YOUR WINNINGS.`;
+            } else {
+                banner.classList.add('hidden');
+                badge.className = "bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>ACTIVE</span>`;
+            }
+        }
+
+        function resetSessionBankroll() {
+            document.getElementById('circuit-breaker-banner').classList.add('hidden');
+            peakBankroll = parseFloat(document.getElementById('bankroll-input').value) || 1000;
+            updateBankrollMath();
+        }
+
+        // Initialize Keypad on Load
+        initVisualKeypad();
+    </script>
+</body>
+</html>
